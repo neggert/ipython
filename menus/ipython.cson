@@ -1,0 +1,16 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  '.overlayer':
+      'Enable ipython': 'ipython:toggle'
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'ipython'
+      'submenu': [
+        { 'label': 'Toggle', 'command': 'ipython:toggle' }
+      ]
+    ]
+  }
+]
