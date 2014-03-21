@@ -5,12 +5,13 @@ module.exports =
   ipythonView: null
 
   activate: (state) ->
-    input = (cmd) =>
-      @ipythonKernelManager.execute_command cmd
+    input = (cmd, id) =>
+      console.log "input id "+id
+      @ipythonKernelManager.execute_command cmd, id
 
     output = (x, n) =>
-      console.log "output "+n+" "+x
-      @ipythonView.io_views[n].output(x, n)
+      console.log "output "+id+" "+x
+      @ipythonView.io_views[id].output(x, n)
 
     @ipythonKernelManager = new IPythonKernelManager()
     @ipythonKernelManager.on_output output

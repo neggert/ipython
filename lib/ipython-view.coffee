@@ -11,16 +11,17 @@ class IpythonView extends ScrollView
   initialize: (@input_callback) ->
     super()
     atom.workspaceView.command "ipython:toggle", => @toggle()
-    @io_views = []
-    @new_io(1)
+    @io_views = {}
+    @new_io()
 
-  input_callback_view: (text) =>
-    @new_io(@io_views.length)
-    @input_callback text
+  input_callback_view: (text, id) =>
+    @new_io()
+    @input_callback text, id
 
-  new_io: (num) =>
-    @io_views[num] = new IPythonIOView(num, @input_callback_view)
-    @termout.append @io_views[num]
+  new_io: =>
+    v = new IPythonIOView @input_callback_view
+    @io_views[v.id] = v
+    @termout.append @io_views[v.id]
 
   # # Returns an object that can be retrieved when package is activated
   # serialize: ->
