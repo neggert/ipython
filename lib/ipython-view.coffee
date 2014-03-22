@@ -13,12 +13,8 @@ class IpythonView extends ScrollView
     @io_views = {}
     @new_io()
 
-  input_callback_view: (text, id) =>
-    @new_io()
-    @input_callback text, id
-
   new_io: =>
-    v = new IPythonIOView @input_callback_view
+    v = new IPythonIOView @input_callback
     @io_views[v.id] = v
     @termout.append @io_views[v.id]
 

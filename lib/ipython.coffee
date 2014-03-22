@@ -8,6 +8,7 @@ module.exports =
     input = (cmd, id) =>
       console.log "input id "+id
       @ipythonKernelManager.execute_command cmd, id
+      @ipythonView.new_io()
 
     handle_exec_reply = (id, n) =>
       console.log "reply id " + id
