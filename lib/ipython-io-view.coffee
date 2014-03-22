@@ -8,7 +8,7 @@ class IPythonIOView extends View
   @content: (input_callback) =>
     @div class: 'ipython-io', =>
       @div class: 'ipython-io-line block', outlet: 'input_div', =>
-        @label "In [ ]:"
+        @label outlet: "input_label", "In [ ]:"
         @subview 'input_ed', new EditorView mini: true
 
   initialize: (@input_callback) ->
@@ -25,6 +25,10 @@ class IPythonIOView extends View
     @input_ed.remove() ## replace?
     @input_div.append $$ ->
       @div class: "editor mini editor-colors", text
+
+  set_n: (n) =>
+    @input_label.replaceWith $$ ->
+      @label "In [#{n}]:"
 
   output: (text, n) =>
     # add an output box containing text

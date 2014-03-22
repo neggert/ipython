@@ -5,7 +5,6 @@ ipmsg = require './ipython-messages'
 module.exports =
   class IPythonKernelManager
     constructor: (settings) ->
-      @n = 0
       @session_id = uuid.v4().toString()
 
       # @conn       = "tcp://"+settings.ip+":"
@@ -55,7 +54,17 @@ module.exports =
       ), time_between_hbs
 
     handle_reply: (reply_msg...) =>
-      console.log "reply "+reply_msg
+      [header, prev_header, content] = ipmsg.parse_msg reply_msg
+
+      msg_type = header.msg_type
+      unless msg_type == "execute_reply"
+        console.log "Got unexpected reply type "+msg_type
+        return
+
+      id = prev_header.msg_id
+      n = parseInt content.execution_count
+
+      @reply_callback id, n
 
     handle_output: (output_msg...) =>
       [header, prev_header, content] = ipmsg.parse_msg output_msg[1..]
@@ -76,7 +85,6 @@ module.exports =
       msg = ipmsg.build_exec_request_msg msg_id, command
       @shell_socket.send msg
 
-      # return a promise to the execution_count?
-      @n += 1
-
     on_output: (@output_callback) ->
+
+    on_reply: (@reply_callback) ->
