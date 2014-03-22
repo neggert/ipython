@@ -72,7 +72,7 @@ module.exports =
       id = prev_header.msg_id
       n = parseInt content.execution_count
       text = content.data
-      @output_callback text, n
+      @output_callback text, id, n
 
     execute_command: (command, msg_id) =>
       console.log "execute_command "+command
@@ -103,7 +103,6 @@ module.exports =
       ''
 
     make_msg_body: (msg_type, msg_id, content) ->
-      msg_id = uuid.v4()
       [
         @make_msg_header msg_id, msg_type
         {}

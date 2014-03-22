@@ -9,7 +9,7 @@ module.exports =
       console.log "input id "+id
       @ipythonKernelManager.execute_command cmd, id
 
-    output = (x, n) =>
+    output = (x, id, n) =>
       console.log "output "+id+" "+x
       @ipythonView.io_views[id].output(x, n)
 
