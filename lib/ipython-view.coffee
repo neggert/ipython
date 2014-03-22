@@ -17,6 +17,7 @@ class IpythonView extends ScrollView
     v = new IPythonIOView @input_callback
     @io_views[v.id] = v
     @termout.append @io_views[v.id]
+    v.input_ed.focus()
 
   # # Returns an object that can be retrieved when package is activated
   # serialize: ->
