@@ -1,4 +1,10 @@
 module.exports =
+  parse_msg: (msg) ->
+    header = JSON.parse msg[2]
+    prev_header = JSON.parse msg[3]
+    content = JSON.parse msg[5]
+    [header, prev_header, content]
+
   build_exec_request_msg: (msg_id, code) ->
     content = @make_command_msg_content code
     @build_full_msg 'execute_request', msg_id, content

@@ -58,21 +58,17 @@ module.exports =
       console.log "reply "+reply_msg
 
     handle_output: (output_msg...) =>
-      header = JSON.parse output_msg[3]
-      prev_header = JSON.parse output_msg[4]
-      content = JSON.parse output_msg[6]
+      [header, prev_header, content] = ipmsg.parse_msg output_msg[1..]
 
       msg_type = header.msg_type
       unless msg_type in ['pyout', 'pyerr']
-        console.log "Got unexpected output type"
-        console.log header
-        console.log content
+        console.log "Got unexpected output type "+msg_type
         return
-      console.log "pyout"
-      console.log content
+
       id = prev_header.msg_id
       n = parseInt content.execution_count
       text = content.data['text/plain']
+
       @output_callback text, id, n
 
     execute_command: (command, msg_id) =>
