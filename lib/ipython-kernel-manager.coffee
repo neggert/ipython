@@ -71,7 +71,7 @@ module.exports =
       console.log content
       id = prev_header.msg_id
       n = parseInt content.execution_count
-      text = content.data
+      text = content.data['text/plain']
       @output_callback text, id, n
 
     execute_command: (command, msg_id) =>
