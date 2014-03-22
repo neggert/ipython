@@ -5,8 +5,7 @@ module.exports =
 class IpythonView extends ScrollView
   @content: ->
     @div class: 'vertical',  =>
-      @div "The Ipython package is Alive! It's ALIVE!"
-      @div outlet: 'termout', class: 'ipython'
+      @div outlet: 'termout', class: 'ipython padded'
 
   initialize: (@input_callback) ->
     super()
