@@ -35,3 +35,10 @@ class IPythonIOView extends View
       @div class: 'ipython-io-line block', =>
         @label "Out [#{n}]:"
         @div class: 'editor mini editor-colors', text
+
+  error: (ename, evalue, n) =>
+    # add an output box containing text
+    @append $$ ->
+      @div class: 'ipython-io-line block', =>
+        @label "Error [ ]:"
+        @div class: 'editor mini editor-colors', ename+": "+evalue
