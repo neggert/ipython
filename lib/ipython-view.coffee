@@ -4,8 +4,8 @@ IPythonIOView = require './ipython-io-view'
 module.exports =
 class IpythonView extends ScrollView
   @content: ->
-    @div class: 'vertical',  =>
-      @div outlet: 'termout', class: 'ipython padded'
+    @div class: 'padded pane-item',  =>
+      @div outlet: 'termout', class: 'ipython'
 
   initialize: (@input_callback) ->
     super()
