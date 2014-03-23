@@ -9,7 +9,7 @@ class IpythonView extends ScrollView
 
   initialize: (@input_callback) ->
     super()
-    atom.workspaceView.command "ipython:toggle", => @toggle()
+    @uri = 'atom://ipython'
     @io_views = {}
     @new_io()
 
@@ -26,9 +26,6 @@ class IpythonView extends ScrollView
   # destroy: ->
   #   @detach()
 
-  toggle: ->
-    console.log "IpythonView was toggled!"
-    if @hasParent()
-      @detach()
-    else
-      atom.workspaceView.appendToRight(this)
+  getTitle: -> "IPython"
+
+  getUri: -> @uri
