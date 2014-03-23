@@ -40,13 +40,11 @@ module.exports =
       setInterval ( =>
         hb_message = Date.now()
         @hb_socket.send hb_message
-        console.log "sending hb"
         @hb_socket._events = {}
         timeout = setTimeout ( ->
           alert('hb timeout')
           ), hb_wait_time
         @hb_socket.on 'message', (msg) =>
-          console.log "got msg "+msg
           clearTimeout timeout if msg = hb_message
       ), time_between_hbs
 
