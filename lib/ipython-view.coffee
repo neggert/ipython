@@ -10,13 +10,13 @@ class IpythonView extends ScrollView
   initialize: (@input_callback) ->
     super()
     @uri = 'atom://ipython'
-    @io_views = {}
+    @ioViews = {}
     @new_io()
 
   new_io: =>
     v = new IPythonIOView @input_callback
-    @io_views[v.id] = v
-    @termout.append @io_views[v.id]
+    @ioViews[v.id] = v
+    @termout.append @ioViews[v.id]
     v.input_ed.focus()
 
   # # Returns an object that can be retrieved when package is activated

@@ -36,7 +36,6 @@ module.exports =
 
     register_callbacks: =>
       @setup_hb(5000, 500)
-      @iopub_socket.on 'message', @handle_output
       @shell_socket.on 'message', @handle_reply
 
     setup_hb: (time_between_hbs, hb_wait_time) =>
@@ -66,25 +65,26 @@ module.exports =
 
       @reply_callback id, n
 
-    handle_output: (output_msg...) =>
-      [header, prev_header, content] = ipmsg.parse_msg output_msg[1..]
-
-      msg_type = header.msg_type
-      unless msg_type in ['pyout', 'pyerr']
-        console.log "Got unexpected output type "+msg_type
-        return
-
-      id = prev_header.msg_id
-      n = parseInt content.execution_count
-      text = content.data['text/plain']
-
-      @output_callback text, id, n
+    # handle_output: (output_msg...) =>
+    #   [header, prev_header, content] = ipmsg.parse_msg output_msg[1..]
+    #
+    #   msg_type = header.msg_type
+    #   unless msg_type in ['pyout', 'pyerr']
+    #     console.log "Got unexpected output type "+msg_type
+    #     return
+    #
+    #   id = prev_header.msg_id
+    #   n = parseInt content.execution_count
+    #   text = content.data['text/plain']
+    #
+    #   @output_callback text, id, n
 
     execute_command: (command, msg_id) =>
       console.log "execute_command "+command
       msg = ipmsg.build_exec_request_msg msg_id, command
       @shell_socket.send msg
 
-    on_output: (@output_callback) ->
+    on_iopub: (cb) =>
+      @iopub_socket.on 'message', cb
 
     on_reply: (@reply_callback) ->
