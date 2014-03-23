@@ -11,13 +11,12 @@ class IPythonIOView extends View
         @label outlet: "input_label", "In [ ]:"
         @subview 'input_ed', new EditorView mini: true
 
-  initialize: (@input_callback) ->
+  initialize: ->
     @id = uuid.v4()
-    # register a callback for when the user hits "Enter" in the input box
+
+  on_input: (cb) =>
     @on 'core:confirm', =>
-      text = @input_ed.getText()
-      @make_input_noneditable()
-      @input_callback(text, @id)
+      cb "execute_request", @id, @input_ed.getText()
 
   make_input_noneditable: =>
     # delete the mini-editor, replace it with a div with the same style and text

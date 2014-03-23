@@ -10,8 +10,7 @@ parse_msg = (msg) ->
   }
 
 module.exports =
-  route = (handle, ipKernelManager, ipView, raw_msg) ->
-    console.log "route"
+  route_output: (handle, ipKernelManager, ipView, raw_msg) ->
 
     msg = parse_msg raw_msg
     msg_type = msg.header.msg_type
@@ -21,3 +20,10 @@ module.exports =
       return
 
     handle[msg_type](msg, ipKernelManager, ipView)
+
+  route_input: (handle, ipKernelManager, ipView, input_type, msg_id, text) ->
+    unless input_type of handle
+      console.log "No handler for input_type "+input_type
+      return
+
+    handle[input_type](msg_id, text, ipKernelManager, ipView)

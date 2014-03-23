@@ -1,29 +1,28 @@
 IpythonView = require './ipython-view'
 IPythonKernelManager = require './ipython-kernel-manager'
-route = require './router'
+{route_output, route_input} = require './router'
 iopub_handlers = require './iopub-handlers'
+shell_handlers = require './shell-handlers'
+input_handlers = require './input-handlers'
 
 ipURI = 'atom://ipython'
 
 createIPythonView = (state) ->
-  handle_input = (cmd, id) =>
-    console.log "input id "+id
-    ipKernelManager.execute_command cmd, id
-    ipView.new_io()
 
-  handle_exec_reply = (id, n) =>
-    console.log "reply id " + id
-    ipView.ioViews[id].set_n n
+  route_cmd_input = (input_type, msg_id, text) ->
+    route_input input_handlers, ipKernelManager, ipView, input_type, msg_id, text
+
+  route_shell = (msg...) ->
+    route_output shell_handlers, ipKernelManager, ipView, msg
 
   route_iopub = (msg...) ->
-    console.log "iopub message"
-    route iopub_handlers, ipKernelManager, ipView, msg
+    route_output iopub_handlers, ipKernelManager, ipView, msg
 
   ipKernelManager = new IPythonKernelManager()
-  ipView = new IpythonView handle_input
+  ipView = new IpythonView route_cmd_input
 
   ipKernelManager.on_iopub route_iopub
-  ipKernelManager.on_reply handle_exec_reply
+  ipKernelManager.on_shell route_shell
 
   ipView
 

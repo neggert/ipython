@@ -1,6 +1,5 @@
 zmq = require 'zmq'
 uuid = require 'node-uuid'
-ipmsg = require './ipython-messages'
 
 module.exports =
   class IPythonKernelManager
@@ -23,7 +22,7 @@ module.exports =
 
       @connect()
       @configure_sockets()
-      @register_callbacks()
+      @setup_hb(5000, 500)
 
     connect: =>
       @shell_socket.connect @conn+@shell_port
@@ -34,9 +33,8 @@ module.exports =
       @shell_socket.setsockopt zmq.ZMQ_IDENTITY, Buffer(@session_id)
       @iopub_socket.setsockopt zmq.ZMQ_SUBSCRIBE, Buffer('')
 
-    register_callbacks: =>
-      @setup_hb(5000, 500)
-      @shell_socket.on 'message', @handle_reply
+    send_shell: (msg) =>
+      @shell_socket.send msg
 
     setup_hb: (time_between_hbs, hb_wait_time) =>
       setInterval ( =>
@@ -52,39 +50,8 @@ module.exports =
           clearTimeout timeout if msg = hb_message
       ), time_between_hbs
 
-    handle_reply: (reply_msg...) =>
-      [header, prev_header, content] = ipmsg.parse_msg reply_msg
-
-      msg_type = header.msg_type
-      unless msg_type == "execute_reply"
-        console.log "Got unexpected reply type "+msg_type
-        return
-
-      id = prev_header.msg_id
-      n = parseInt content.execution_count
-
-      @reply_callback id, n
-
-    # handle_output: (output_msg...) =>
-    #   [header, prev_header, content] = ipmsg.parse_msg output_msg[1..]
-    #
-    #   msg_type = header.msg_type
-    #   unless msg_type in ['pyout', 'pyerr']
-    #     console.log "Got unexpected output type "+msg_type
-    #     return
-    #
-    #   id = prev_header.msg_id
-    #   n = parseInt content.execution_count
-    #   text = content.data['text/plain']
-    #
-    #   @output_callback text, id, n
-
-    execute_command: (command, msg_id) =>
-      console.log "execute_command "+command
-      msg = ipmsg.build_exec_request_msg msg_id, command
-      @shell_socket.send msg
-
     on_iopub: (cb) =>
       @iopub_socket.on 'message', cb
 
-    on_reply: (@reply_callback) ->
+    on_shell: (cb) ->
+      @shell_socket.on 'message', cb
