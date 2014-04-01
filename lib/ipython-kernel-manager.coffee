@@ -6,15 +6,10 @@ module.exports =
     constructor: (settings) ->
       @session_id = uuid.v4().toString()
 
-      # @conn       = "tcp://"+settings.ip+":"
-      # @shell_port = settings.shell_port
-      # @iopub_port = settings.iopub_port
-      # @hb_port    = settings.hb_port
-
-      @conn       = "tcp://127.0.0.1:"
-      @shell_port = "51575"
-      @iopub_port = "56902"
-      @hb_port    = "52938"
+      @conn       = "tcp://"+settings.ip+":"
+      @shell_port = settings.shell_port
+      @iopub_port = settings.iopub_port
+      @hb_port    = settings.hb_port
 
       @shell_socket = zmq.socket 'dealer'
       @iopub_socket = zmq.socket 'sub'
