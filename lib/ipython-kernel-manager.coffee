@@ -1,10 +1,28 @@
 zmq = require 'zmq'
 uuid = require 'node-uuid'
+fs = require 'fs'
+path = require 'path'
+
+getIPythonSettings = ->
+  ipDir = atom.config.get "ipython.ipythonDirectory"
+  ipProfileDir = "profile_" + atom.config.get "ipython.ipythonProfile"
+  profileDir = path.join ipDir, ipProfileDir
+  kernelFileName = path.join profileDir, "security", atom.config.get "ipython.existingKernelFile"
+
+  try
+    settingsFile = fs.readFileSync kernelFileName
+  catch err
+    displayError err.message
+    throw err
+
+  JSON.parse settingsFile
 
 module.exports =
   class IPythonKernelManager
-    constructor: (settings) ->
+    constructor:  ->
       @session_id = uuid.v4().toString()
+
+      settings = getIPythonSettings()
 
       @conn       = "tcp://"+settings.ip+":"
       @shell_port = settings.shell_port
