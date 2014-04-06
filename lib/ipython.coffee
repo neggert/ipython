@@ -40,6 +40,7 @@ module.exports =
     existingKernelFile: ''
     ipythonDirectory: path.join process.env.HOME, ".ipython"
     ipythonProfile: 'default'
+    ipythonExecutable: ''
 
   activate: (state) ->
 
@@ -49,9 +50,9 @@ module.exports =
     atom.workspaceView.command "ipython:start", ->
       atom.workspaceView.open(ipURI)
 
-
   deactivate: ->
     @ipythonView.destroy()
+    @ipythonKernelManager.destroy()
 
   serialize: ->
     ipythonViewState: @ipythonView.serialize()

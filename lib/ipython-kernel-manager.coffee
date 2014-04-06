@@ -2,27 +2,42 @@ zmq = require 'zmq'
 uuid = require 'node-uuid'
 fs = require 'fs'
 path = require 'path'
+child_process = require 'child_process'
 
-getIPythonSettings = ->
+getFullKernelPath = (kernelFileName) ->
   ipDir = atom.config.get "ipython.ipythonDirectory"
   ipProfileDir = "profile_" + atom.config.get "ipython.ipythonProfile"
   profileDir = path.join ipDir, ipProfileDir
-  kernelFileName = path.join profileDir, "security", atom.config.get "ipython.existingKernelFile"
+  path.join profileDir, "security", kernelFileName
 
-  try
-    settingsFile = fs.readFileSync kernelFileName
-  catch err
-    displayError err.message
-    throw err
+getIPythonSettings = (kernelFileName) ->
+  settingsFile = null
+  i = 0
 
+  # it can take a few ms for ipython to create the file
+  # should find a way to make this non-blocking
+  until settingsFile? or i > 100
+    try
+      settingsFile = fs.readFileSync kernelFileName
+    catch err
+      if i > 100
+        alert err.message
+        throw err
   JSON.parse settingsFile
+
+getIPythonExecutable = () ->
+  exe = atom.config.get "ipython.ipythonExecutable"
+  if exe.length == 0
+    "ipython"
+  else
+    exe
 
 module.exports =
   class IPythonKernelManager
     constructor:  ->
       @session_id = uuid.v4().toString()
-
-      settings = getIPythonSettings()
+      @kernelProcess = null
+      settings = @initializeKernel()
 
       @conn       = "tcp://"+settings.ip+":"
       @shell_port = settings.shell_port
@@ -37,10 +52,34 @@ module.exports =
       @configure_sockets()
       @setup_hb(5000, 500)
 
+    initializeKernel: =>
+      kernelFileName = atom.config.get "ipython.existingKernelFile"
+      kernelFileName = @launchKernel() if kernelFileName.length == 0
+      getIPythonSettings(kernelFileName)
+
+    launchKernel: =>
+      ipythonExe = getIPythonExecutable()
+      @kernelProcess = child_process.spawn ipythonExe, [
+          "kernel"
+          "--profile="+(atom.config.get "ipython.ipythonProfile")
+          "--ipython-dir="+(atom.config.get "ipython.ipythonDirectory")
+          "--no-secure"
+        ],
+        {
+          cwd: process.cwd()
+          env: process.env
+          stdio: 'inherit'
+        }
+      kernelName = "kernel-"+@kernelProcess.pid+".json"
+      getFullKernelPath kernelName
+
     connect: =>
       @shell_socket.connect @conn+@shell_port
       @iopub_socket.connect @conn+@iopub_port
       @hb_socket.connect @conn+@hb_port
+
+    destroy: =>
+      @kernelProcess?.kill()
 
     configure_sockets: =>
       @shell_socket.setsockopt zmq.ZMQ_IDENTITY, Buffer(@session_id)
